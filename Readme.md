@@ -1,6 +1,6 @@
 # LICENSE
 
-The fragment shader (frag.glsl) is available under the Creative Commons CC BY-NC 3.0
+The fragment shader (frag.glsl) and the images (images folder) are available under the Creative Commons CC BY-NC 3.0
 license (https://creativecommons.org/licenses/by-nc/3.0/).
 
 The rest (javascript, html, CSS) is available under the terms of the GNU general public license version 3.

@@ -133,3 +133,13 @@ button{
     animation-name: bonusanim;
     animation-duration: 0.5s;
 }
+
+.lives{
+	position:absolute;
+	bottom:0;
+	right:0;
+}
+
+.life{
+	width:40px;
+}

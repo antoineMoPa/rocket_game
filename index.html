@@ -20,6 +20,9 @@
 			<div class="bonus-display">
 			</div>
 			<canvas class="game-canvas" v-on:mousemove="canvas_mousemove"></canvas>
+			<div class="lives">
+				<img class="life" v-for="live in lives" src="images/rocket.png">
+			</div>
 			<pre class="fragment-error-pre">
 			</pre>
 			<pre class="vertex-error-pre">
