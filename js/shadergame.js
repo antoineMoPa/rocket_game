@@ -16,6 +16,10 @@ var is_example = window.location.href.match(/\?file\=([_a-zA-Z0-9\/]+\.glsl)/);
 var DEFAULT_WIDTH = window.innerWidth;
 var DEFAULT_HEIGHT = window.innerHeight;
 var started = false;
+var STATUS_MENU = 0;
+var STATUS_PLAYING = 1;
+var STATUS_AD = 1;
+
 
 var app = new Vue({
     el: "#shadergame-app",
@@ -23,10 +27,12 @@ var app = new Vue({
         canvas: null,
 		points: 0,
 		has_sg_api: false,
+		status: STATUS_MENU,
 		sound_mode: false,
 		send_status: "",
         error: "",
 		passes: 1,
+		games: 0,
 		lives: 3,
 		passes_defined_in_code: false,
 		ratio: 1,
@@ -79,6 +85,17 @@ var app = new Vue({
 			var x = (e.clientX - c.offsetLeft) / this.width - 0.5;
 			var y = (e.clientY - c.offsetTop) / this.height - 0.5;
 			this.mouse = [x, -y];
+		},
+		start: function(){
+			this.lives = 3;
+			this.points = 0;
+			this.status = STATUS_PLAYING;
+		},
+		dead: function(){
+			this.status = STATUS_MENU;
+			this.games++;
+			rocket_pos[0] = 0.0;
+			rocket_pos[1] = -0.2;
 		}
     }
 });
@@ -400,7 +417,9 @@ function update_shader(){
 
 function update_screen(){
 	draw_ctx(game_canvas, gl);
-	compute();
+	if(app.status == STATUS_PLAYING){
+		compute();
+	}
 	window.requestAnimationFrame(update_screen);
 }
 
@@ -459,7 +478,7 @@ function one_less_live_anim(){
 			get_uniform('flashing'),
 			false
 		);
-	},600);
+	},1500);
 }
 
 function points_up_anim(){
@@ -583,7 +602,10 @@ function compute(){
 	if(distance(asteroid, rocket_pos) < 0.1){
 		coinaudio.play();
 		asteroid[1] = -1.0;
-		app.lives -= 1;
+		app.lives--;
+		if(app.lives <= 0){
+			app.dead();
+		}
 		one_less_live_anim();
 	}
 

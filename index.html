@@ -27,6 +27,15 @@
 			</pre>
 			<pre class="vertex-error-pre">
 			</pre>
+			<div class="menu" v-if="status == STATUS_MENU">
+				<p class="text-center your-score" v-if="games > 0" >
+					Your scored {{points}} points!
+				</p>
+				<div class="text-center">
+					<img src="images/play.png" class="menu-button play-img"
+						 v-on:click="start()">
+				</div>
+			</div>
 		</div>
 		<script name="vertex-shader" type="text/plain">// Vertex Shader
 attribute vec3 position;

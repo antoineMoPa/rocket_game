@@ -195,7 +195,7 @@ void main(void){
 		vec4 r = rocket(rp);
 		
 		if(flashing > 0.5){
-			r *= cos(time * 170.0);
+			r *= floor(2.0 * abs(cos(time * 600.0))) + 0.3;
 		}
 
 		col = col * (1.0 - r.a) + r * r.a;
