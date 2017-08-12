@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>ShaderGame</title>
+		<link rel="stylesheet" href="css/base.css?version=1.0.3">
+		<link rel="stylesheet" href="css/style.css?version=1.0.3">
+	</head>
+	<body>
+		<header>
+            <h1>ShaderGame</h1>
+		</header>
+		<audio name="coinsound">
+			<source src="music/8bitcoin.mp3" type="audio/mpeg">
+		</audio>
+		<audio name="music">
+			<source src="music/bct/BigCarTheft.mp3" type="audio/mpeg">
+		</audio>
+		<div id="shadergame-app" class="page-content vertical-scroll-parent">
+			<canvas class="game-canvas" v-on:mousemove="canvas_mousemove"></canvas>
+			<pre class="fragment-error-pre">
+			</pre>
+			<pre class="vertex-error-pre">
+			</pre>
+		</div>
+		<script name="vertex-shader" type="text/plain">// Vertex Shader
+attribute vec3 position;
+varying vec2 UV;
+varying vec2 lastUV;
+varying vec3 v_position;
+uniform vec2 renderBufferRatio;
+			
+void main(){
+	v_position = position;
+	UV = vec2((position.x+1.0) / 2.0, (position.y + 1.0)/2.0);
+	lastUV = UV / renderBufferRatio;
+	gl_Position = vec4(v_position.x,v_position.y, 0.0, 1.0);
+}
+		</script>
+		
+		<script src="js/lib/vue.min.js?version=1.0.3"></script>
+		<script src="js/lib/base.js?version=1.0.3"></script>
+		<script src="js/shadergame.js?version=1.0.3"></script>
+	</body>
+</html>
