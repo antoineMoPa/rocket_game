@@ -21,6 +21,7 @@ var app = new Vue({
     el: "#shadergame-app",
     data: {
         canvas: null,
+		points: 0,
 		has_sg_api: false,
 		sound_mode: false,
 		send_status: "",
@@ -410,6 +411,14 @@ function distance(vec1, vec2){
 	);
 }
 
+function points_up(){
+	var ptsdisp = qsa(".points-display")[0];
+	ptsdisp.classList.add("points-up-anim");
+	setInterval(function(){
+		ptsdisp.classList.remove("points-up-anim");
+	},500);
+}
+
 function compute(){
 	var curr_time = new Date().getTime();
 	var dt;
@@ -425,10 +434,10 @@ function compute(){
 	var angle = rocket_pos[2];
 	
 	if(watched_keys["ArrowLeft"]){
-		rocket_speed[2] -= dt * 0.1;
+		rocket_speed[2] -= dt * 0.2 * (rocket_speed[2] + 1.4);
 	}
 	if (watched_keys["ArrowRight"]) {
-		rocket_speed[2] += dt * 0.1;
+		rocket_speed[2] += dt * 0.2 * (rocket_speed[2] + 1.4);
 	}
 	if(watched_keys["ArrowUp"]){
 		rocket_speed[0] -= dt * 0.01 * Math.cos(angle + Math.PI/2);
@@ -439,11 +448,11 @@ function compute(){
 		rocket_speed[1] -= dt * 0.02 * Math.sin(angle + Math.PI/2);
 	}
 
-	// Gravity towards center
-	if(rocket_pos[1] > 0.0){
-		rocket_speed[1] -= 0.03 * Math.abs(rocket_pos[1]);
+	// Gravity towards normal position
+	if(rocket_pos[1] > -0.3){
+		rocket_speed[1] -= 0.03 * Math.abs(rocket_pos[1] + 0.3);
 	} else {
-		rocket_speed[1] += 0.03 * Math.abs(rocket_pos[1]);
+		rocket_speed[1] += 0.03 * Math.abs(rocket_pos[1] + 0.3);
 	}
 	
 	
@@ -452,11 +461,8 @@ function compute(){
 	rocket_pos[1] += dt * rocket_speed[1];
 	rocket_speed[1] *= 0.9;
 	rocket_pos[2] += dt * rocket_speed[2];
-	rocket_speed[2] *= 0.8;
+	rocket_speed[2] *= 0.6;
 
-	//rocket_pos[0] *= 0.96;
-	//rocket_pos[1] *= 0.96;
-	
 	if(rocket_pos[1] > 1.0 / app.ratio){
 		rocket_pos[1] = 1.0 / app.ratio;
 	}
@@ -471,16 +477,20 @@ function compute(){
 		rocket_pos[0] = -1.0;
 	}
 
+	// Has point?
 	if(distance(star, rocket_pos) < 0.1){
 		coinaudio.play();
-		star[1] = 1.0;
+		star[1] = -1.0;
+		app.points += 100;
+		points_up();
 	}
 	
 	star[1] -= dt * 0.03;
+	
 	// Bring back star to the top
 	if(star[1] < -1.2){
 		star[1] = 1.0;
-		star[0] = Math.random() * app.ratio;
+		star[0] = Math.random();
 	}
 }
 

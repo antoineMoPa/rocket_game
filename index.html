@@ -7,9 +7,6 @@
 		<link rel="stylesheet" href="css/style.css?version=1.0.3">
 	</head>
 	<body>
-		<header>
-            <h1>ShaderGame</h1>
-		</header>
 		<audio name="coinsound">
 			<source src="music/8bitcoin.mp3" type="audio/mpeg">
 		</audio>
@@ -17,6 +14,9 @@
 			<source src="music/bct/BigCarTheft.mp3" type="audio/mpeg">
 		</audio>
 		<div id="shadergame-app" class="page-content vertical-scroll-parent">
+			<p class="points-display">
+				{{ points }}
+			</p>
 			<canvas class="game-canvas" v-on:mousemove="canvas_mousemove"></canvas>
 			<pre class="fragment-error-pre">
 			</pre>

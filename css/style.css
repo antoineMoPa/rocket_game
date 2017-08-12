@@ -84,3 +84,26 @@ button{
     font-size:16px;
     cursor:pointer;
 }
+
+.points-display{
+	position:absolute;
+	top:0;
+	right:40px;
+	line-height:25px;
+	font-size:30px;
+	color:#ff2;
+}
+
+@keyframes pointsup {
+    0% {
+		transform: scale(5.2) translateX(-200%) translateY(200%);
+	}
+    100% {
+		transform: scale(1.0);
+	}
+}
+
+.points-up-anim{
+    animation-name: pointsup;
+    animation-duration: 1s;
+}
