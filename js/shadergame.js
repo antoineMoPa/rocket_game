@@ -399,10 +399,12 @@ window.onkeyup = function(e){
 	}
 };
 
-var lastTime = null;
+var last_time = null;
+var last_dsecond = null; // (d for deci (10^-1))
+var begin_time = new Date().getTime();
 var rocket_pos = [0.0, -0.23, 0]; // Last is angle
 var rocket_speed = [0.0, 0.0, 0]; // Last is angle'
-var star = [-0.3, 0.0];
+var star = [0.0, -1.0];
 
 function distance(vec1, vec2){
 	return Math.sqrt(
@@ -411,26 +413,36 @@ function distance(vec1, vec2){
 	);
 }
 
-function points_up(){
-	var ptsdisp = qsa(".points-display")[0];
-	ptsdisp.classList.add("points-up-anim");
+function bonus(msg){
+	var bonusdisp = qsa(".bonus-display")[0];
+	bonusdisp.classList.add("bonus-anim");
+	bonusdisp.innerText = msg;
 	setInterval(function(){
-		ptsdisp.classList.remove("points-up-anim");
-	},500);
+		bonusdisp.classList.remove("bonus-anim");
+		bonusdisp.innerText = "";
+	},2000);
 }
 
 function compute(){
 	var curr_time = new Date().getTime();
 	var dt;
 
-	if(lastTime == null){
+	if(last_time == null){
 		dt = 30 / 100;
 	} else {
-		dt = (curr_time - lastTime) / 100;
+		dt = (curr_time - last_time) / 100;
 	}
 	
-	lastTime = curr_time;
+	last_time = curr_time;
+	curr_dsecond = Math.floor(curr_time / 10);
+	
+	// Passed one second?
+	if(last_dsecond != curr_dsecond){
+		app.points += 1;
+	}
 
+	last_dsecond = curr_dsecond;
+	
 	var angle = rocket_pos[2];
 	
 	if(watched_keys["ArrowLeft"]){
@@ -457,12 +469,19 @@ function compute(){
 	
 	
 	rocket_pos[0] += dt * rocket_speed[0];
-	rocket_speed[0] *= 0.9;
+	rocket_speed[0] *= 0.94;
 	rocket_pos[1] += dt * rocket_speed[1];
-	rocket_speed[1] *= 0.9;
+	rocket_speed[1] *= 0.94;
 	rocket_pos[2] += dt * rocket_speed[2];
 	rocket_speed[2] *= 0.6;
 
+	// Restrict angle
+	if(rocket_pos[2] > 1.4){
+		rocket_pos[2] = 1.4;
+	} else if(rocket_pos[2] < -1.4){
+		rocket_pos[2] = -1.4;
+	}
+	
 	if(rocket_pos[1] > 1.0 / app.ratio){
 		rocket_pos[1] = 1.0 / app.ratio;
 	}
@@ -482,7 +501,7 @@ function compute(){
 		coinaudio.play();
 		star[1] = -1.0;
 		app.points += 100;
-		points_up();
+		bonus("+100");
 	}
 	
 	star[1] -= dt * 0.03;
