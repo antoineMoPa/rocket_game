@@ -5,6 +5,7 @@ uniform vec3 iResolution;
 uniform vec2 renderBufferRatio;
 uniform vec3 rocket_pos;
 uniform vec3 rocket_speed;
+uniform vec2 star;
 varying vec2 lastUV;
 uniform float time;
 uniform int pass;
@@ -83,6 +84,15 @@ mat2 rotation(vec2 pos, float angle){
     return r;
 }
 
+float tri(float a){
+	float aa = mod(a, 1.0);
+	if(aa < 0.5){
+		return aa * 2.0;
+	} else {
+		return 1.0 - (aa - 0.5) * 2.0;
+	}
+}
+
 void main(void){
 	float x = UV.x * ratio;
 	float y = UV.y;
@@ -110,7 +120,7 @@ void main(void){
 		if(distance(smoke_pos, vec2(0.0)) < 0.12){
 			smoke_pos += 0.01 * cos(pos.x * 2.0 + time * 10.0 + pos.y * 20.0);
 			
-			for(int i = 0; i < 10; i++){
+			for(int i = 0; i < 8; i++){
 				float fi = float(i);
 				float xoff = 0.01 * sin(fi * 4.0 + time * 3.0);
 				float yoff = 0.03 * cos(fi * 3.0 + time * 5.0);
@@ -142,9 +152,27 @@ void main(void){
 
 		// Smoke:
 		col += texture2D(lastPass, lastUV);
-		
+
 		vec4 r = rocket(rp);
-        col = col * (1.0 - r.a) + r * r.a;
+		col = col * (1.0 - r.a) + r * r.a;
+		
+		// Add stars
+		if(distance(pos, star) < 0.04){
+			vec2 sp = (pos - star);
+			
+			float angle = atan(sp.y, sp.x);
+			float d = length(sp) / 0.04;
+
+			float f = 1.0 - tri(angle * 5.0 / PI2) * 0.27;
+
+			if(d < f){
+				col.rg += 0.8;
+				if(abs(d - f) > 0.1){
+					col.rg += 0.2;
+				}
+			}
+		}
+		
 	}
 	
 	col.a = 1.0;

@@ -27,13 +27,9 @@ var app = new Vue({
         error: "",
 		passes: 1,
 		passes_defined_in_code: false,
+		ratio: 1,
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT,
-		gifjs: {
-			quality: 8,
-			dithering: 'FloydSteinberg'
-		},
-		autocompile: true,
 		mouse: [0, 0],
 		images: []
     },
@@ -324,6 +320,11 @@ function draw_ctx(can, ctx){
 		);
 
 		gl.uniform2fv(
+			gl.getUniformLocation(ctx.program, 'star'),
+			star
+		);
+		
+		gl.uniform2fv(
 			gl.getUniformLocation(ctx.program, 'mouse'),
 			[ app.mouse[0], app.mouse[1] ]
 		);
@@ -349,7 +350,7 @@ function draw_ctx(can, ctx){
 		
 		// Screen ratio
 		var ratio = can.width / can.height;
-		
+		app.ratio = ratio;
 		var ratioAttribute = ctx.getUniformLocation(ctx.program, "ratio");
 		ctx.uniform1f(ratioAttribute, ratio);
 		
@@ -400,62 +401,92 @@ window.onkeyup = function(e){
 var lastTime = null;
 var rocket_pos = [0.0, -0.23, 0]; // Last is angle
 var rocket_speed = [0.0, 0.0, 0]; // Last is angle'
+var star = [-0.3, 0.0];
+
+function distance(vec1, vec2){
+	return Math.sqrt(
+		Math.pow(vec2[1] - vec1[1],2.0) +
+		Math.pow(vec2[0] - vec1[0],2.0)
+	);
+}
 
 function compute(){
 	var curr_time = new Date().getTime();
 	var dt;
 
 	if(lastTime == null){
-		dt = 30;
+		dt = 30 / 100;
 	} else {
-		dt = curr_time - lastTime;
+		dt = (curr_time - lastTime) / 100;
 	}
+	
 	lastTime = curr_time;
-
-	var tweak = dt * 0.017;
 
 	var angle = rocket_pos[2];
 	
 	if(watched_keys["ArrowLeft"]){
-		rocket_speed[2] -= tweak * 0.04;
+		rocket_speed[2] -= dt * 0.1;
 	}
 	if (watched_keys["ArrowRight"]) {
-		rocket_speed[2] += tweak * 0.04;
+		rocket_speed[2] += dt * 0.1;
 	}
 	if(watched_keys["ArrowUp"]){
-		rocket_speed[0] -= tweak * 0.01 * Math.cos(angle + Math.PI/2);
-		rocket_speed[1] += tweak * 0.02 * Math.sin(angle + Math.PI/2);
+		rocket_speed[0] -= dt * 0.01 * Math.cos(angle + Math.PI/2);
+		rocket_speed[1] += dt * 0.02 * Math.sin(angle + Math.PI/2);
 	}
 	if (watched_keys["ArrowDown"]) {
-		rocket_speed[0] += tweak * 0.01 * Math.cos(angle + Math.PI/2);
-		rocket_speed[1] -= tweak * 0.02 * Math.sin(angle + Math.PI/2);
+		rocket_speed[0] += dt * 0.01 * Math.cos(angle + Math.PI/2);
+		rocket_speed[1] -= dt * 0.02 * Math.sin(angle + Math.PI/2);
 	}
 
-	// Gravity
-	rocket_speed[1] -= 0.003;
+	// Gravity towards center
+	if(rocket_pos[1] > 0.0){
+		rocket_speed[1] -= 0.03 * Math.abs(rocket_pos[1]);
+	} else {
+		rocket_speed[1] += 0.03 * Math.abs(rocket_pos[1]);
+	}
 	
-	rocket_pos[0] += tweak * rocket_speed[0];
+	
+	rocket_pos[0] += dt * rocket_speed[0];
 	rocket_speed[0] *= 0.9;
-	rocket_pos[1] += tweak * rocket_speed[1];
+	rocket_pos[1] += dt * rocket_speed[1];
 	rocket_speed[1] *= 0.9;
-	rocket_pos[2] += tweak * rocket_speed[2];
+	rocket_pos[2] += dt * rocket_speed[2];
 	rocket_speed[2] *= 0.8;
 
 	//rocket_pos[0] *= 0.96;
 	//rocket_pos[1] *= 0.96;
 	
-	if(rocket_pos[1] > 0.3){
-		rocket_pos[1] = 0.3;
+	if(rocket_pos[1] > 1.0 / app.ratio){
+		rocket_pos[1] = 1.0 / app.ratio;
 	}
-	if(rocket_pos[1] < -0.3){
-		rocket_pos[1] = -0.3;
+	if(rocket_pos[1] < -1.0 / app.ratio){
+		rocket_pos[1] = -1.0 / app.ratio;
+	}
+	
+	if(rocket_pos[0] > 1.0){
+		rocket_pos[0] = 1.0;
+	}
+	if(rocket_pos[0] < -1.0){
+		rocket_pos[0] = -1.0;
 	}
 
+	if(distance(star, rocket_pos) < 0.1){
+		coinaudio.play();
+		star[1] = 1.0;
+	}
 	
+	star[1] -= dt * 0.03;
+	// Bring back star to the top
+	if(star[1] < -1.2){
+		star[1] = 1.0;
+		star[0] = Math.random() * app.ratio;
+	}
 }
 
 var coinaudio = qsa("audio[name='coinsound']")[0];
-coinaudio.play();
+coinaudio.volume = 0.2;
 
 var musicaudio = qsa("audio[name='music']")[0];
+musicaudio.volume = 0.1;
 musicaudio.play();
