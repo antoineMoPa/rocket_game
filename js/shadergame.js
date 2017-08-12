@@ -318,6 +318,11 @@ function draw_ctx(can, ctx){
 			rocket_pos
 		);
 
+		gl.uniform3fv(
+			gl.getUniformLocation(ctx.program, 'rocket_speed'),
+			rocket_speed
+		);
+
 		gl.uniform2fv(
 			gl.getUniformLocation(ctx.program, 'mouse'),
 			[ app.mouse[0], app.mouse[1] ]
@@ -405,32 +410,35 @@ function compute(){
 	} else {
 		dt = curr_time - lastTime;
 	}
+	lastTime = curr_time;
+
+	var tweak = dt * 0.017;
 
 	var angle = rocket_pos[2];
 	
 	if(watched_keys["ArrowLeft"]){
-		rocket_speed[2] -= 0.04;
+		rocket_speed[2] -= tweak * 0.04;
 	}
 	if (watched_keys["ArrowRight"]) {
-		rocket_speed[2] += 0.04;
+		rocket_speed[2] += tweak * 0.04;
 	}
 	if(watched_keys["ArrowUp"]){
-		rocket_speed[0] -= 0.01 * Math.cos(angle + Math.PI/2);
-		rocket_speed[1] += 0.02 * Math.sin(angle + Math.PI/2);
+		rocket_speed[0] -= tweak * 0.01 * Math.cos(angle + Math.PI/2);
+		rocket_speed[1] += tweak * 0.02 * Math.sin(angle + Math.PI/2);
 	}
 	if (watched_keys["ArrowDown"]) {
-		rocket_speed[0] += 0.01 * Math.cos(angle + Math.PI/2);
-		rocket_speed[1] -= 0.02 * Math.sin(angle + Math.PI/2);
+		rocket_speed[0] += tweak * 0.01 * Math.cos(angle + Math.PI/2);
+		rocket_speed[1] -= tweak * 0.02 * Math.sin(angle + Math.PI/2);
 	}
 
 	// Gravity
 	rocket_speed[1] -= 0.003;
 	
-	rocket_pos[0] += rocket_speed[0];
+	rocket_pos[0] += tweak * rocket_speed[0];
 	rocket_speed[0] *= 0.9;
-	rocket_pos[1] += rocket_speed[1];
+	rocket_pos[1] += tweak * rocket_speed[1];
 	rocket_speed[1] *= 0.9;
-	rocket_pos[2] += rocket_speed[2];
+	rocket_pos[2] += tweak * rocket_speed[2];
 	rocket_speed[2] *= 0.8;
 
 	//rocket_pos[0] *= 0.96;

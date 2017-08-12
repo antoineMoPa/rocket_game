@@ -4,6 +4,7 @@ varying vec2 UV;
 uniform vec3 iResolution;
 uniform vec2 renderBufferRatio;
 uniform vec3 rocket_pos;
+uniform vec3 rocket_speed;
 varying vec2 lastUV;
 uniform float time;
 uniform int pass;
@@ -93,38 +94,55 @@ void main(void){
 	angle += 0.01 * cos(time * PI2) + 0.02 * cos(2.0 * time * PI2);
 	vec2 rp = (pos - rocket_pos.xy) * rotation(pos, angle);
 	rp *= 4.0;
-        
+
+	vec2 pixel = 1.0 / iResolution.xy;
+	
 	if(pass == 1){
 		// Draw smoke
+		float spreadfac = 1.0 - abs(rocket_speed.y) * 10.0;
 		col += texture2D(pass1, lastUV + vec2(0.0, 0.02));
-		col += texture2D(pass1, lastUV + vec2(0.003, 0.04));
-		col += texture2D(pass1, lastUV + vec2(-0.003, 0.04));
+		col += texture2D(pass1, lastUV + vec2(0.003 * spreadfac, 0.04));
+		col += texture2D(pass1, lastUV + vec2(-0.003 * spreadfac, 0.04));
+		col *= 0.44;
+		
 		vec2 smoke_pos = (pos  - rocket_pos.xy) * rotation(pos, angle);
-
-		if(distance(smoke_pos, vec2(0.0)) < 0.15){
+		
+		if(distance(smoke_pos, vec2(0.0)) < 0.12){
+			smoke_pos += 0.01 * cos(pos.x * 2.0 + time * 10.0 + pos.y * 20.0);
+			
 			for(int i = 0; i < 10; i++){
 				float fi = float(i);
 				float xoff = 0.01 * sin(fi * 4.0 + time * 3.0);
 				float yoff = 0.03 * cos(fi * 3.0 + time * 5.0);
-				float doff = 0.003 * cos(time * 10.0 + fi);
-				if(distance(smoke_pos, vec2(xoff, -0.09 + yoff)) < 0.017 + doff){
+				xoff += rocket_speed.x * 0.3;
+				yoff += rocket_speed.y * 0.3;
+
+				float doff = 0.005 * cos(time * 10.0 + fi);
+				if(distance(smoke_pos, vec2(xoff, -0.09 + yoff)) < 0.014 + doff){
 					col.rgb +=
-						vec3(1.0, 0.3, 0.1) *
-						(0.3 + 0.1 * cos(time * 20.0 + fi + 1.0));
+						vec3(1.0, 0.4, 0.1) *
+						(0.8 + 0.1 * cos(time * 20.0 + fi + 1.0));
 				}
 			}
 		}
-		col *= 0.4;
+		col *= 0.8;
 		// Make whiter smoke with time
 		col = 0.85 * col + 0.15 * length(col.rgb)/3.0;
 	} else if (pass == 2) {
-		col = texture2D(lastPass, lastUV);
+		pixel *= 2.0;
+		// Smoke + blur
+		col += 0.25 * texture2D(lastPass, lastUV + vec2(0.0, pixel.y));
+		col += 0.25 * texture2D(lastPass, lastUV + vec2(0.0, -pixel.y));
+		col += 0.25 * texture2D(lastPass, lastUV + vec2(pixel.x, 0.0));
+		col += 0.25 * texture2D(lastPass, lastUV + vec2(-pixel.x, 0.0));
 	} else {
 		// Sky
 		col.r += pos.y * 0.4 + 0.4;
 		col.b += pos.y * 0.3 + 0.4;
-		// Smoke
+
+		// Smoke:
 		col += texture2D(lastPass, lastUV);
+		
 		vec4 r = rocket(rp);
         col = col * (1.0 - r.a) + r * r.a;
 	}
