@@ -1,3 +1,16 @@
+/*
+  frag.glsl
+  
+  Copyright 2017 Antoine Morin-Paulhus
+  
+  You may use this file under the terms of the 
+  Creative Commons "Attribution-NonCommercial 3.0 Unported" Licence.
+  You may find details of this licence at the following URL: 
+  
+  https://creativecommons.org/licenses/by-nc/3.0/legalcode
+  
+ */
+
 precision highp float;
 
 varying vec2 UV;
