@@ -279,14 +279,26 @@ function init_program(ctx){
     ctx.vertexAttribPointer(positionAttribute, 3, ctx.FLOAT, false, 0, 0);
 }
 
-function draw_ctx(can, ctx){
+var uniforms = {};
+var program = null;
 
+function get_uniform(name){
+	if(uniforms[name] != undefined){
+		return uniforms[name];
+	} else {
+		return uniforms[name] = gl.getUniformLocation(program, name);
+	}
+}
+
+function draw_ctx(can, ctx){
+	program = ctx.program;
+	
 	if(ctx.program == undefined){
 		return;
 	}
 
 	gl.uniform2fv(
-		gl.getUniformLocation(ctx.program, 'renderBufferRatio'),
+		get_uniform("renderBufferRatio"),
 		[
 			renderBufferDim[0] / app.width,
 			renderBufferDim[1] / app.height
@@ -294,29 +306,51 @@ function draw_ctx(can, ctx){
 	);
 	
 	gl.uniform3fv(
-		gl.getUniformLocation(ctx.program, 'rocket_pos'),
+		get_uniform('rocket_pos'),
 		rocket_pos
 	);
 	
 	gl.uniform3fv(
-		gl.getUniformLocation(ctx.program, 'rocket_speed'),
+		get_uniform('rocket_speed'),
 		rocket_speed
 	);
 	
 	gl.uniform2fv(
-		gl.getUniformLocation(ctx.program, 'star'),
+		get_uniform('star'),
 		star
 	);
 	
 	gl.uniform1f(
-		gl.getUniformLocation(ctx.program, 'accelerating'),
+		get_uniform('accelerating'),
 		accelerating
 	);
 	
 	gl.uniform2fv(
-		gl.getUniformLocation(ctx.program, 'mouse'),
+		get_uniform('mouse'),
 		[ app.mouse[0], app.mouse[1] ]
 	);
+
+	var timeAttribute = get_uniform("time");
+	var date = new Date();
+	var gtime = (date.getTime() % (3600 * 24)) / 1000.0;
+	ctx.uniform1f(timeAttribute, gtime);
+	
+	var iResolutionAttribute = get_uniform("iResolution");
+	
+	ctx.uniform3fv(iResolutionAttribute,
+				   new Float32Array(
+					   [
+						   can.width,
+						   can.height,
+						   1.0
+					   ])
+				  );
+	
+	// Screen ratio
+	var ratio = can.width / can.height;
+	app.ratio = ratio;
+	var ratioAttribute = get_uniform("ratio");
+	ctx.uniform1f(ratioAttribute, ratio);
 	
 	for(var pass = 0; pass < app.passes; pass++ ){
 		if(pass < app.passes - 1){
@@ -329,7 +363,7 @@ function draw_ctx(can, ctx){
 		if(pass > 0){
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, rttTexture[pass - 1]);
-			gl.uniform1i(gl.getUniformLocation(ctx.program, 'lastPass'), pass - 1);
+			gl.uniform1i(get_uniform('lastPass'), pass - 1);
 		}
 		
 		for(var i = 0; i < app.passes; i++){
@@ -339,35 +373,14 @@ function draw_ctx(can, ctx){
 				gl.bindTexture(gl.TEXTURE_2D, null);
 				continue;
 			}
-			var att = gl.getUniformLocation(ctx.program, "pass" + i);
+			var att = get_uniform("pass" + i);
 			gl.bindTexture(gl.TEXTURE_2D, rttTexture[i]);
 			gl.uniform1i(att,i);
 		}
 
-		var passAttribute = ctx.getUniformLocation(ctx.program, "pass");
+		var passAttribute = get_uniform("pass");
 		ctx.uniform1i(passAttribute, pass + 1);
 
-		var timeAttribute = ctx.getUniformLocation(ctx.program, "time");
-		var date = new Date();
-		var gtime = (date.getTime() % (3600 * 24)) / 1000.0;
-		ctx.uniform1f(timeAttribute, gtime);
-		
-		var iResolutionAttribute = ctx.getUniformLocation(ctx.program, "iResolution");
-		
-		ctx.uniform3fv(iResolutionAttribute,
-					   new Float32Array(
-						   [
-							   can.width,
-							   can.height,
-							   1.0
-						   ])
-					  );
-		
-		// Screen ratio
-		var ratio = can.width / can.height;
-		app.ratio = ratio;
-		var ratioAttribute = ctx.getUniformLocation(ctx.program, "ratio");
-		ctx.uniform1f(ratioAttribute, ratio);
 		
 		ctx.drawArrays(ctx.TRIANGLE_STRIP, 0, 4);
 		
@@ -500,9 +513,9 @@ function compute(){
 
 	// Gravity towards normal position
 	if(rocket_pos[1] > -0.3){
-		rocket_speed[1] -= 0.03 * Math.abs(rocket_pos[1] + 0.3);
+		rocket_speed[1] -= 0.01 * Math.abs(rocket_pos[1] + 0.3);
 	} else {
-		rocket_speed[1] += 0.03 * Math.abs(rocket_pos[1] + 0.3);
+		rocket_speed[1] += 0.01 * Math.abs(rocket_pos[1] + 0.3);
 	}
 	
 	
