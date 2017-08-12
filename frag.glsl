@@ -19,6 +19,7 @@ uniform vec2 renderBufferRatio;
 uniform vec3 rocket_pos;
 uniform vec3 rocket_speed;
 uniform vec2 star;
+uniform float accelerating;
 varying vec2 lastUV;
 uniform float time;
 uniform int pass;
@@ -130,51 +131,55 @@ void main(void){
 	if(pass == 1){
 		// Draw smoke
 		float spreadfac = 1.0 - abs(rocket_speed.y) * 10.0;
-		col += texture2D(pass1, lastUV + vec2(0.0, 0.02));
-		col += texture2D(pass1, lastUV + vec2(0.003 * spreadfac, 0.04));
-		col += texture2D(pass1, lastUV + vec2(-0.003 * spreadfac, 0.04));
+		float speedfac = 1.0 * length(abs(rocket_speed.xy));
+		col += 0.1 * texture2D(pass1, lastUV + vec2(0.0, 0.002));
+		col += 0.2 * texture2D(pass1, lastUV + vec2(0.0, 0.008));
+		col += 0.5* texture2D(pass1, lastUV + vec2(0.0, 0.03));
+		col += 0.5 * texture2D(pass1, lastUV + vec2(0.002, 0.0));
+		col += 0.5 * texture2D(pass1, lastUV + vec2(-0.002, 0.0));
+		col += 0.5 * texture2D(pass1, lastUV + vec2(0.008, 0.0));
+		col += 0.5 * texture2D(pass1, lastUV + vec2(-0.008, 0.0));
+		
 		col *= 0.44;
 		
 		vec2 smoke_pos = (pos  - rocket_pos.xy) * rotation(pos, angle);
+		smoke_pos += vec2(0.0, 0.1);
+		smoke_pos += vec2(0.0, 0.06 * accelerating);
+		smoke_pos *= vec2(1.0, 1.0 - 0.5 * accelerating);
 		
-		if(distance(smoke_pos, vec2(0.0)) < 0.12){
-			smoke_pos += 0.01 * cos(pos.x * 2.0 + time * 10.0 + pos.y * 20.0);
+		float sd = distance(smoke_pos, vec2(0.0)) / 0.06;
+		
+		if(sd < 1.0){
+			float smokeblend = (1.0 - sd);
+			smokeblend = pow(smokeblend, 2.0);
 			
-			for(int i = 0; i < 8; i++){
-				float fi = float(i);
-				float xoff = 0.01 * sin(fi * 4.0 + time * 3.0);
-				float yoff = 0.03 * cos(fi * 3.0 + time * 5.0);
-				xoff += rocket_speed.x * 0.3;
-				yoff += rocket_speed.y * 0.3;
-
-				float doff = 0.005 * cos(time * 10.0 + fi);
-				if(distance(smoke_pos, vec2(xoff, -0.09 + yoff)) < 0.014 + doff){
-					col.rgb +=
-						vec3(1.0, 0.4, 0.1) *
-						(0.8 + 0.1 * cos(time * 20.0 + fi + 1.0));
-				}
-			}
+			col.rgb += smokeblend * vec3(1.0, 0.4, 0.1);
+			col.g += 0.6 * accelerating * smokeblend * (1.0 + 0.5 * cos(time * 20.0 + pos.y * 10.0));
+			
 		}
 		col *= 0.8;
 		// Make whiter smoke with time
 		col = 0.85 * col + 0.15 * length(col.rgb)/3.0;
 	} else if (pass == 2) {
-		pixel *= 2.0;
-		// Smoke + blur
-		col += 0.25 * texture2D(lastPass, lastUV + vec2(0.0, pixel.y));
-		col += 0.25 * texture2D(lastPass, lastUV + vec2(0.0, -pixel.y));
-		col += 0.25 * texture2D(lastPass, lastUV + vec2(pixel.x, 0.0));
-		col += 0.25 * texture2D(lastPass, lastUV + vec2(-pixel.x, 0.0));
-	} else {
+		// Smoke
+		col += texture2D(lastPass, lastUV);
+		//float blendfac = 0.01 / 4.0;
+		//col += blendfac * texture2D(lastPass, lastUV + vec2(0.0, pixel.y));
+		//col += blendfac * texture2D(lastPass, lastUV + vec2(0.0, -pixel.y));
+		//col += blendfac * texture2D(lastPass, lastUV + vec2(pixel.x, 0.0));
+		//col += blendfac * texture2D(lastPass, lastUV + vec2(-pixel.x, 0.0));
+	} else if (pass == 3){
 		// Sky
-		col.r += pos.y * 0.4 + 0.4;
-		col.b += pos.y * 0.3 + 0.4;
+		col.r += pos.y * 0.4 + 0.05 * cos(pos.y * 0.3 + time * 0.4) + 0.4;
+		col.b += 0.3 * pos.y + 0.1 * cos(pos.y * 0.3 + time * 1.0) + 0.4;
+
+		// Rocket
+		vec4 r = rocket(rp);
+		col = col * (1.0 - r.a) + r * r.a;
 
 		// Smoke:
 		col += texture2D(lastPass, lastUV);
 
-		vec4 r = rocket(rp);
-		col = col * (1.0 - r.a) + r * r.a;
 		
 		// Add stars
 		if(distance(pos, star) < 0.04){
@@ -192,7 +197,6 @@ void main(void){
 				}
 			}
 		}
-		
 	}
 	
 	col.a = 1.0;

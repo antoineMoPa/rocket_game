@@ -10,15 +10,15 @@
 		<audio name="coinsound">
 			<source src="music/8bitcoin.mp3" type="audio/mpeg">
 		</audio>
-		<audio name="music">
+		<audio loop name="music">
 			<source src="music/bct/BigCarTheft.mp3" type="audio/mpeg">
 		</audio>
 		<div id="shadergame-app" class="page-content vertical-scroll-parent">
 			<p class="points-display">
 				{{ points }}
 			</p>
-			<p class="bonus-display">
-			</p>
+			<div class="bonus-display">
+			</div>
 			<canvas class="game-canvas" v-on:mousemove="canvas_mousemove"></canvas>
 			<pre class="fragment-error-pre">
 			</pre>

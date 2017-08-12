@@ -83,12 +83,11 @@ var app = new Vue({
 });
 
 function resize(){
-    var parent = qsa(".vertical-scroll-parent")[0];
-    if(window.innerWidth > 768){
-        parent.style.height = window.innerHeight + "px";
-    } else {
-        parent.style.height = "auto";
-    }
+	if(started){
+		app.re_init_ctx();
+		app.width = window.innerWidth;
+		app.height = window.innerHeight;
+	}
 }
 
 resize();
@@ -129,7 +128,9 @@ var timeout = null;
 function init_ctx(ctx){
 	var ww = 2;
 	var hh = 2;
-
+	var lastww = ww;
+	var lasthh = hh;
+	
 	// Delete previous textures
 	for(var i = 0; i < rttTexture.length; i++){
 		gl.deleteTexture(rttTexture[i]);
@@ -137,14 +138,22 @@ function init_ctx(ctx){
 		gl.deleteFramebuffer(framebuffer[i]);
 	}
 
+	
 	// Find nearest power of 2 above width and height
 	while(app.width > ww){
 		ww <<= 1;
+		lastww = ww;
 	}
 	while(app.height > hh){
 		hh <<= 1;
+		lasthh = hh;
 	}
 
+	// Use smaller power of 2 to save computing
+	// & huge render textures
+	ww = lastww;
+	hh = lasthh;
+	
 	renderBufferDim = [ww, hh];
 	
 	for(var i = 0; i < app.passes; i++){
@@ -275,6 +284,39 @@ function draw_ctx(can, ctx){
 	if(ctx.program == undefined){
 		return;
 	}
+
+	gl.uniform2fv(
+		gl.getUniformLocation(ctx.program, 'renderBufferRatio'),
+		[
+			renderBufferDim[0] / app.width,
+			renderBufferDim[1] / app.height
+		]
+	);
+	
+	gl.uniform3fv(
+		gl.getUniformLocation(ctx.program, 'rocket_pos'),
+		rocket_pos
+	);
+	
+	gl.uniform3fv(
+		gl.getUniformLocation(ctx.program, 'rocket_speed'),
+		rocket_speed
+	);
+	
+	gl.uniform2fv(
+		gl.getUniformLocation(ctx.program, 'star'),
+		star
+	);
+	
+	gl.uniform1f(
+		gl.getUniformLocation(ctx.program, 'accelerating'),
+		accelerating
+	);
+	
+	gl.uniform2fv(
+		gl.getUniformLocation(ctx.program, 'mouse'),
+		[ app.mouse[0], app.mouse[1] ]
+	);
 	
 	for(var pass = 0; pass < app.passes; pass++ ){
 		if(pass < app.passes - 1){
@@ -301,34 +343,6 @@ function draw_ctx(can, ctx){
 			gl.bindTexture(gl.TEXTURE_2D, rttTexture[i]);
 			gl.uniform1i(att,i);
 		}
-
-		gl.uniform2fv(
-			gl.getUniformLocation(ctx.program, 'renderBufferRatio'),
-			[
-				renderBufferDim[0] / app.width,
-				renderBufferDim[1] / app.height
-			]
-				);
-		
-		gl.uniform3fv(
-			gl.getUniformLocation(ctx.program, 'rocket_pos'),
-			rocket_pos
-		);
-
-		gl.uniform3fv(
-			gl.getUniformLocation(ctx.program, 'rocket_speed'),
-			rocket_speed
-		);
-
-		gl.uniform2fv(
-			gl.getUniformLocation(ctx.program, 'star'),
-			star
-		);
-		
-		gl.uniform2fv(
-			gl.getUniformLocation(ctx.program, 'mouse'),
-			[ app.mouse[0], app.mouse[1] ]
-		);
 
 		var passAttribute = ctx.getUniformLocation(ctx.program, "pass");
 		ctx.uniform1i(passAttribute, pass + 1);
@@ -405,6 +419,7 @@ var begin_time = new Date().getTime();
 var rocket_pos = [0.0, -0.23, 0]; // Last is angle
 var rocket_speed = [0.0, 0.0, 0]; // Last is angle'
 var star = [0.0, -1.0];
+var accelerating = 0;
 
 function distance(vec1, vec2){
 	return Math.sqrt(
@@ -454,6 +469,9 @@ function compute(){
 	if(watched_keys["ArrowUp"]){
 		rocket_speed[0] -= dt * 0.01 * Math.cos(angle + Math.PI/2);
 		rocket_speed[1] += dt * 0.02 * Math.sin(angle + Math.PI/2);
+		accelerating = 1.0;
+	} else {
+		accelerating = 0.0;
 	}
 	if (watched_keys["ArrowDown"]) {
 		rocket_speed[0] += dt * 0.01 * Math.cos(angle + Math.PI/2);
