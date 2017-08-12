@@ -413,14 +413,6 @@ window.onkeyup = function(e){
 	}
 };
 
-var last_time = null;
-var last_dsecond = null; // (d for deci (10^-1))
-var begin_time = new Date().getTime();
-var rocket_pos = [0.0, -0.23, 0]; // Last is angle
-var rocket_speed = [0.0, 0.0, 0]; // Last is angle'
-var star = [0.0, -1.0];
-var accelerating = 0;
-
 function distance(vec1, vec2){
 	return Math.sqrt(
 		Math.pow(vec2[1] - vec1[1],2.0) +
@@ -432,11 +424,30 @@ function bonus(msg){
 	var bonusdisp = qsa(".bonus-display")[0];
 	bonusdisp.classList.add("bonus-anim");
 	bonusdisp.innerText = msg;
-	setInterval(function(){
+	setTimeout(function(){
 		bonusdisp.classList.remove("bonus-anim");
 		bonusdisp.innerText = "";
 	},2000);
 }
+
+function points_up_anim(){
+	var ptsdisp = qsa(".points-display")[0];
+	
+	ptsdisp.classList.add("points-up-anim");
+
+	setTimeout(function(){
+		ptsdisp.classList.remove("points-up-anim");
+	},500);
+}
+
+var last_time = null;
+var last_points_th = 0; // Last points thousand
+var last_dsecond = null; // (d for deci (10^-1))
+var begin_time = new Date().getTime();
+var rocket_pos = [0.0, -0.23, 0]; // Last is angle
+var rocket_speed = [0.0, 0.0, 0]; // Last is angle'
+var star = [0.0, -1.0];
+var accelerating = 0;
 
 function compute(){
 	var curr_time = new Date().getTime();
@@ -453,9 +464,18 @@ function compute(){
 	
 	// Passed one second?
 	if(last_dsecond != curr_dsecond){
-		app.points += 1;
+		app.points += 5;
+	}
+	
+	// Thousands counter
+	var curr_points_th = Math.floor(app.points / 1000);
+	// Passed thousand?
+	if(last_points_th != curr_points_th && curr_points_th != 0){
+		points_up_anim();
 	}
 
+	last_points_th = curr_points_th;
+	
 	last_dsecond = curr_dsecond;
 	
 	var angle = rocket_pos[2];
@@ -531,12 +551,12 @@ function compute(){
 	// Bring back star to the top
 	if(star[1] < -1.2){
 		star[1] = 1.0;
-		star[0] = Math.random();
+		star[0] = 2.0 * (Math.random() - 0.5);
 	}
 }
 
 var coinaudio = qsa("audio[name='coinsound']")[0];
-coinaudio.volume = 0.2;
+coinaudio.volume = 0.1;
 
 var musicaudio = qsa("audio[name='music']")[0];
 musicaudio.volume = 0.06;
