@@ -20,9 +20,9 @@ uniform float ratio;
 
 //PASSES=3
 
-vec4 rocket(vec2 pos){
+vec4 rocket_side(vec2 pos){
     vec4 col = vec4(0.0);
-    
+	
     // Clip (because otherwise a sine is repeated)
     if(pos.x < -0.5 || pos.x > 0.5){
         return col;
@@ -30,30 +30,29 @@ vec4 rocket(vec2 pos){
     
     if(
       // Base parabolic shape
-      pos.y + 0.02 * cos(12.0 * pos.y + 0.1) * pos.y < 0.5 - pow(3.88 * pos.x, 2.0) && pos.y > -0.1 
+      pos.y < 0.3 && pos.y > -0.1 && pos.x < 0.2 ||
+	  (pos.y > 0.3 && 3.0 * (pos.y - 0.3) < cos(pos.x * 8.0))
       ||
         // Lower rectangle
        ( pos.y < 0.0 && pos.y > -0.2 
-            && 
-                // Lower left arc
-                (pos.x > -0.1 || distance(pos, vec2(-0.1,-0.1)) < 0.10) 
-                // Lower right arc
+		 // Lower right arc
             &&     (pos.x < 0.1  || distance(pos, vec2(0.1,-0.1)) < 0.10)
        )
       )
     {
         // Window
         if (
-            distance(pos, vec2(0.0,0.2)) < 0.05
+            distance(pos, vec2(0.0,0.25)) < 0.05 ||
+			distance(pos, vec2(0.0,0.04)) < 0.05
         )
         {
-            col.rgb += vec3(0.1,0.1,0.1);
+            col.rgb += 0.4;
             col.a = 1.0;
         }
         // Rest
         else
         {
-            col.rgb += vec3(1.0,1.0,1.0);
+            col.rgb += 0.98;
             col.a = 1.0;
         }
     }
@@ -69,7 +68,7 @@ vec4 rocket(vec2 pos){
     }
     
     // Propeller
-    else if (pos.x < 0.1 && pos.y < 0.0 && pos.x > -0.1 && pos.y > -0.3)
+    else if (pos.x < 0.1 && pos.y < 0.0 && pos.y > -0.3)
     {
         col.rgb += vec3(0.3,0.3,0.3) + 0.3 * cos(pos.x * 10.0 + 1.0);
         col.a = 1.0;
@@ -77,6 +76,14 @@ vec4 rocket(vec2 pos){
        
     
     return col;
+}
+
+vec4 rocket(vec2 pos){
+	if(pos.x > 0.0){
+		return rocket_side(pos);
+	} else {
+		return rocket_side(pos * vec2(-1.0, 1.0));
+	}
 }
 
 mat2 rotation(vec2 pos, float angle){
