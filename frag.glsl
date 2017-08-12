@@ -44,20 +44,13 @@ vec4 rocket_side(vec2 pos){
     
     if(
       // Base parabolic shape
-      pos.y < 0.3 && pos.y > -0.1 && pos.x < 0.2 ||
-	  (pos.y > 0.3 && 3.0 * (pos.y - 0.3) < cos(pos.x * 8.0))
-      ||
-        // Lower rectangle
-       ( pos.y < 0.0 && pos.y > -0.2 
-		 // Lower right arc
-            &&     (pos.x < 0.1  || distance(pos, vec2(0.1,-0.1)) < 0.10)
-       )
-      )
+		(pos.y > -0.14 && 3.0 * (pos.y - 0.3) < cos(pos.x * 8.0) * (2.0 - pos.y))
+		&&
+		(pos.y > 0.0 || distance(pos, vec2(0.0, 0.1)) < 0.27))
     {
         // Window
         if (
-            distance(pos, vec2(0.0,0.25)) < 0.05 ||
-			distance(pos, vec2(0.0,0.04)) < 0.05
+            distance(pos, vec2(0.0,0.2)) < 0.05
         )
         {
             col.rgb += 0.4;
@@ -163,40 +156,49 @@ void main(void){
 	} else if (pass == 2) {
 		// Smoke
 		col += texture2D(lastPass, lastUV);
-		//float blendfac = 0.01 / 4.0;
-		//col += blendfac * texture2D(lastPass, lastUV + vec2(0.0, pixel.y));
-		//col += blendfac * texture2D(lastPass, lastUV + vec2(0.0, -pixel.y));
-		//col += blendfac * texture2D(lastPass, lastUV + vec2(pixel.x, 0.0));
-		//col += blendfac * texture2D(lastPass, lastUV + vec2(-pixel.x, 0.0));
 	} else if (pass == 3){
 		// Sky
 		col.r += pos.y * 0.4 + 0.05 * cos(pos.y * 0.3 + time * 0.4) + 0.4;
 		col.b += 0.3 * pos.y + 0.1 * cos(pos.y * 0.3 + time * 1.0) + 0.4;
-
-		// Rocket
-		vec4 r = rocket(rp);
-		col = col * (1.0 - r.a) + r * r.a;
-
-		// Smoke:
-		col += texture2D(lastPass, lastUV);
-
-		
+				
 		// Add stars
-		if(distance(pos, star) < 0.04){
-			vec2 sp = (pos - star);
+		if(distance(pos, star) < 0.1){
+			float closefac = 0.0;
+			float rd = distance(rocket_pos.xy, star) / 0.4;
+
+			if(rd < 1.0){
+				closefac += 1.0 - rd;
+			}
 			
+			vec2 sp = (pos - star);
 			float angle = atan(sp.y, sp.x);
-			float d = length(sp) / 0.04;
+			float d = length(sp) / (0.04 + 0.08 * closefac);
 
 			float f = 1.0 - tri(angle * 5.0 / PI2) * 0.27;
 
 			if(d < f){
 				col.rg += 0.8;
-				if(abs(d - f) > 0.1){
-					col.rg += 0.2;
-				}
 			}
 		}
+
+		// Rocket
+		vec4 r = rocket(rp);
+		col = col * (1.0 - r.a) + r * r.a;
+
+		float rd = distance(pos, rocket_pos.xy) / 0.2;
+
+		// Subtle Rocket glow
+		if(rd < 1.0){
+			col.r += 0.1 * abs(cos(time)) * (1.0 - rd);
+			col.g += 0.1 * abs(cos(1.2 * time + 1.0)) * (1.0 - rd);
+			col.b += 0.1 * abs(cos(1.3 * time + 2.0)) * (1.0 - rd);
+		}
+		
+		// Smoke:
+		col += texture2D(lastPass, lastUV);
+
+
+		col *= 1.0 - 0.3 * pow(length(pos),2.0);
 	}
 	
 	col.a = 1.0;

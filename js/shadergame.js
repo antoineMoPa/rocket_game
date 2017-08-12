@@ -499,19 +499,23 @@ function compute(){
 	} else if(rocket_pos[2] < -1.4){
 		rocket_pos[2] = -1.4;
 	}
-	
+
+	// Clamp vertical
 	if(rocket_pos[1] > 1.0 / app.ratio){
 		rocket_pos[1] = 1.0 / app.ratio;
 	}
 	if(rocket_pos[1] < -1.0 / app.ratio){
 		rocket_pos[1] = -1.0 / app.ratio;
 	}
-	
+
+	// Pacman positionning horizontal
 	if(rocket_pos[0] > 1.0){
-		rocket_pos[0] = 1.0;
+		rocket_pos[0] = -0.9;
+		rocket_speed[0] *= 0.2;
 	}
 	if(rocket_pos[0] < -1.0){
-		rocket_pos[0] = -1.0;
+		rocket_pos[0] = 0.9;
+		rocket_speed[0] *= 0.2;
 	}
 
 	// Has point?
@@ -535,5 +539,5 @@ var coinaudio = qsa("audio[name='coinsound']")[0];
 coinaudio.volume = 0.2;
 
 var musicaudio = qsa("audio[name='music']")[0];
-musicaudio.volume = 0.1;
+musicaudio.volume = 0.06;
 musicaudio.play();
