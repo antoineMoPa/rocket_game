@@ -19,9 +19,11 @@ uniform vec2 renderBufferRatio;
 uniform vec3 rocket_pos;
 uniform vec3 rocket_speed;
 uniform vec2 star;
+uniform vec2 asteroid;
 uniform float accelerating;
 varying vec2 lastUV;
 uniform float time;
+uniform float flashing;
 uniform int pass;
 uniform sampler2D pass0;
 uniform sampler2D pass1;
@@ -80,7 +82,6 @@ vec4 rocket_side(vec2 pos){
         col.rgb += vec3(0.3,0.3,0.3) + 0.3 * cos(pos.x * 10.0 + 1.0);
         col.a = 1.0;
     }
-       
     
     return col;
 }
@@ -119,6 +120,9 @@ void main(void){
 	vec2 rp = (pos - rocket_pos.xy) * rotation(pos, angle);
 	rp *= 4.0;
 
+	// Asteroid distance
+	float ad = distance(pos.xy, asteroid);
+	
 	vec2 pixel = 1.0 / iResolution.xy;
 	
 	if(pass == 1){
@@ -153,6 +157,12 @@ void main(void){
 		col *= 0.8;
 		// Make whiter smoke with time
 		col = 0.85 * col + 0.15 * length(col.rgb)/3.0;
+
+		// Asteroid smoke
+		if(ad < 0.1){
+			col.rgb += 0.01 * (1.0 - ad)/0.1 * vec3(1.0, 0.3, 0.4);
+		}
+		
 	} else if (pass == 2) {
 		// Smoke
 		col += texture2D(lastPass, lastUV);
@@ -161,7 +171,7 @@ void main(void){
 		col.r += pos.y * 0.4 + 0.05 * cos(pos.y * 0.3 + time * 0.4) + 0.4;
 		col.b += 0.3 * pos.y + 0.1 * cos(pos.y * 0.3 + time * 1.0) + 0.4;
 				
-		// Add stars
+		// Add star
 		if(distance(pos, star) < 0.1){
 			float closefac = 0.0;
 			float rd = distance(rocket_pos.xy, star) / 0.4;
@@ -180,11 +190,16 @@ void main(void){
 				col.rg += 0.8;
 			}
 		}
-
+		
 		// Rocket
 		vec4 r = rocket(rp);
-		col = col * (1.0 - r.a) + r * r.a;
+		
+		if(flashing > 0.5){
+			r *= cos(time * 170.0);
+		}
 
+		col = col * (1.0 - r.a) + r * r.a;
+		
 		float rd = distance(pos, rocket_pos.xy) / 0.2;
 
 		// Subtle Rocket glow
@@ -194,10 +209,25 @@ void main(void){
 			col.b += 0.1 * abs(cos(1.3 * time + 2.0)) * (1.0 - rd);
 		}
 		
+		
 		// Smoke:
 		col += texture2D(lastPass, lastUV);
 
+		// Add asteroid
+		if(ad < 0.2){
+			ad = ad/0.12;
+			vec2 ap = (pos - asteroid);
+			float angle = atan(ap.y, ap.x);
+			angle += time * 2.0;
+			float f = 1.0 - cos(angle * 6.0) * 0.07 - cos(angle * 20.0 + 1.0) * 0.02 - cos(angle * 3.0 + 2.0) * 0.04;
 
+			if(ad < f){
+				col.rgb *= 0.0;
+				col.rgb += vec3(0.6, 0.2, 0.2);
+				col.rgb += 0.1 * cos(ad * 4.0 + f);
+			}
+		}
+		
 		col *= 1.0 - 0.3 * pow(length(pos),2.0);
 	}
 	

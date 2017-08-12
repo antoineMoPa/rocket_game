@@ -27,6 +27,7 @@ var app = new Vue({
 		send_status: "",
         error: "",
 		passes: 1,
+		lives: 3,
 		passes_defined_in_code: false,
 		ratio: 1,
         width: DEFAULT_WIDTH,
@@ -319,6 +320,11 @@ function draw_ctx(can, ctx){
 		get_uniform('star'),
 		star
 	);
+
+	gl.uniform2fv(
+		get_uniform('asteroid'),
+		asteroid
+	);
 	
 	gl.uniform1f(
 		get_uniform('accelerating'),
@@ -443,6 +449,19 @@ function bonus(msg){
 	},2000);
 }
 
+function one_less_live_anim(){
+	gl.uniform1f(
+		get_uniform('flashing'),
+		true
+	);
+	setTimeout(function(){
+		gl.uniform1f(
+			get_uniform('flashing'),
+			false
+		);
+	},600);
+}
+
 function points_up_anim(){
 	var ptsdisp = qsa(".points-display")[0];
 	
@@ -460,6 +479,7 @@ var begin_time = new Date().getTime();
 var rocket_pos = [0.0, -0.23, 0]; // Last is angle
 var rocket_speed = [0.0, 0.0, 0]; // Last is angle'
 var star = [0.0, -1.0];
+var asteroid = [0.0, -1.0];
 var accelerating = 0;
 
 function compute(){
@@ -477,7 +497,7 @@ function compute(){
 	
 	// Passed one second?
 	if(last_dsecond != curr_dsecond){
-		app.points += 5;
+		app.points += 2;
 	}
 	
 	// Thousands counter
@@ -558,13 +578,33 @@ function compute(){
 		app.points += 100;
 		bonus("+100");
 	}
-	
+
+	// Has hit asteroid ?
+	if(distance(asteroid, rocket_pos) < 0.1){
+		coinaudio.play();
+		asteroid[1] = -1.0;
+		app.lives -= 1;
+		one_less_live_anim();
+	}
+
 	star[1] -= dt * 0.03;
 	
 	// Bring back star to the top
 	if(star[1] < -1.2){
 		star[1] = 1.0;
 		star[0] = 2.0 * (Math.random() - 0.5);
+	}
+
+	asteroid[1] -= dt * 0.02;
+	// Put asteroid closer to rocket
+	var asteroid_fac = 0.01 * dt;
+	asteroid[0] = (1.0 - asteroid_fac) * asteroid[0] + asteroid_fac * rocket_pos[0];
+	
+	// Bring back asteroid to the top
+	if(asteroid[1] < -1.7){
+		asteroid[1] = 1.0;
+		// Put it close to rocket
+		asteroid[0] = 0.1 * (Math.random() - 0.5) + rocket_pos[0];
 	}
 }
 
