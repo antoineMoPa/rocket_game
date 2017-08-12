@@ -4,8 +4,8 @@
   Copyright 2017 Antoine Morin-Paulhus
   
   You may use this file under the terms of the 
-  Creative Commons "Attribution-NonCommercial 3.0 Unported" Licence.
-  You may find details of this licence at the following URL: 
+  Creative Commons "Attribution-NonCommercial 3.0 Unported" License.
+  You may find details of this license at the following URL: 
   
   https://creativecommons.org/licenses/by-nc/3.0/legalcode
   
