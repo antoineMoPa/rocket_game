@@ -597,7 +597,8 @@ function compute(){
 
 	asteroid[1] -= dt * 0.02;
 	// Put asteroid closer to rocket
-	var asteroid_fac = 0.01 * dt;
+	var asteroid_fac = (0.01 + 0.01 * curr_points_th) * dt;
+
 	asteroid[0] = (1.0 - asteroid_fac) * asteroid[0] + asteroid_fac * rocket_pos[0];
 	
 	// Bring back asteroid to the top
