@@ -18,13 +18,13 @@ var DEFAULT_HEIGHT = window.innerHeight;
 var started = false;
 
 var coinaudio = qsa("audio[name='coinsound']")[0];
-coinaudio.volume = 1.0;
+coinaudio.volume = 0.5;
 
 var failaudio = qsa("audio[name='failsound']")[0];
-failaudio.volume = 1.0;
+failaudio.volume = 0.5;
 
 var boomaudio = qsa("audio[name='boomsound']")[0];
-boomaudio.volume = 0.1;
+boomaudio.volume = 1.0;
 
 //var STATUS_MENU = 0;
 //var STATUS_PLAYING = 1;
