@@ -20,6 +20,13 @@ var started = false;
 //var STATUS_PLAYING = 1;
 //var STATUS_AD = 1;
 
+var watched_keys = {
+	" ": false,
+	"ArrowLeft": false,
+	"ArrowRight": false,
+	"ArrowUp": false,
+	"ArrowDown": false,
+}
 
 var app = new Vue({
     el: "#shadergame-app",
@@ -55,6 +62,18 @@ var app = new Vue({
 		re_init_ctx: function(){
 			init_ctx(gl);
 			uniforms = {}
+		},
+		go_left: function(){
+			watched_keys["ArrowLeft"] = true;
+			setTimeout(function(){
+				watched_keys["ArrowLeft"] = false;
+			}, 100);
+		},
+		go_right: function(){
+			watched_keys["ArrowRight"] = true;
+			setTimeout(function(){
+				watched_keys["ArrowRight"] = false;
+			}, 100);
 		},
 	 	manage_passes: function(){
 			var c = fragment_code;
@@ -430,14 +449,6 @@ function update_screen(){
 window.requestAnimationFrame(update_screen);
 
 var rendering_gif = false;
-
-var watched_keys = {
-	" ": false,
-	"ArrowLeft": false,
-	"ArrowRight": false,
-	"ArrowUp": false,
-	"ArrowDown": false,
-}
 
 window.onkeydown = function(e){
 	for(var i in watched_keys){

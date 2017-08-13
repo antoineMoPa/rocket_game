@@ -171,3 +171,17 @@ button{
 	color:#fe7;
 	text-shadow:2px 2px 0 #441;  
 }
+
+.left-keyboard{
+	position:absolute;
+	bottom:6px;
+	left:0;
+	cursor:pointer;
+}
+
+.right-keyboard{
+	position:absolute;
+	bottom:6px;
+	right:0;
+	cursor:pointer;
+}
