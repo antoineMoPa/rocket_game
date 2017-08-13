@@ -679,13 +679,23 @@ function compute(){
 	}
 
 	asteroid[1] -= dt * 0.02;
+	
 	// Put asteroid closer to rocket
-	var asteroid_fac = (0.01 + 0.01 * curr_points_th) * dt;
+	var asteroid_fac = (0.015 + 0.01 * curr_points_th) * dt;
 
 	asteroid[0] = (1.0 - asteroid_fac) * asteroid[0] + asteroid_fac * rocket_pos[0];
+
+	var more_asteroid_fac = 0.0;
+
+	more_asteroid_fac = 0.1 * curr_points_th;
+	
+	// Limit it
+	if(more_asteroid_fac > 0.7){
+		more_asteroid_fac = 0.7;
+	}
 	
 	// Bring back asteroid to the top
-	if(asteroid[1] < -1.7){
+	if(asteroid[1] < -1.7 - more_asteroid_fac){
 		asteroid[1] = 1.0;
 		// Put it close to rocket
 		asteroid[0] = 0.1 * (Math.random() - 0.5) + rocket_pos[0];
