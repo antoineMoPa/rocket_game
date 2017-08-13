@@ -16,9 +16,9 @@ var is_example = window.location.href.match(/\?file\=([_a-zA-Z0-9\/]+\.glsl)/);
 var DEFAULT_WIDTH = window.innerWidth;
 var DEFAULT_HEIGHT = window.innerHeight;
 var started = false;
-var STATUS_MENU = 0;
-var STATUS_PLAYING = 1;
-var STATUS_AD = 1;
+//var STATUS_MENU = 0;
+//var STATUS_PLAYING = 1;
+//var STATUS_AD = 1;
 
 
 var app = new Vue({
@@ -26,10 +26,7 @@ var app = new Vue({
     data: {
         canvas: null,
 		points: 0,
-		has_sg_api: false,
-		status: STATUS_MENU,
-		sound_mode: false,
-		send_status: "",
+		status: 0,
         error: "",
 		passes: 1,
 		games: 0,
@@ -42,12 +39,6 @@ var app = new Vue({
 		images: []
     },
     watch: {
-		'gifjs.dithering': function(d){
-			// Convert string to null
-			if(d == "false"){
-				this.gifjs.dithering = false;
-			}
-		},
         width: function(w){
             this.canvas.width = w;
 			this.re_init_ctx();
@@ -63,6 +54,7 @@ var app = new Vue({
     methods: {
 		re_init_ctx: function(){
 			init_ctx(gl);
+			uniforms = {}
 		},
 	 	manage_passes: function(){
 			var c = fragment_code;
@@ -89,13 +81,24 @@ var app = new Vue({
 		start: function(){
 			this.lives = 3;
 			this.points = 0;
-			this.status = STATUS_PLAYING;
+			begin_time = new Date().getTime();
+			star = [0.0, -1.0];
+			asteroid = [0.0, -1.0];
+			this.status = 1;
+			rocket_pos[0] = 0.0;
+			rocket_pos[1] = -0.2;
+			rocket_pos[2] = 0.0;
+			musicaudio.play();
+			musicaudio.currentTime = 0;
 		},
 		dead: function(){
-			this.status = STATUS_MENU;
+			this.status = 0;
 			this.games++;
 			rocket_pos[0] = 0.0;
 			rocket_pos[1] = -0.2;
+			rocket_pos[2] = 0.0;
+			musicaudio.pause();
+			failaudio.play();
 		}
     }
 });
@@ -166,7 +169,7 @@ function init_ctx(ctx){
 		hh <<= 1;
 		lasthh = hh;
 	}
-
+	
 	// Use smaller power of 2 to save computing
 	// & huge render textures
 	ww = lastww;
@@ -174,8 +177,8 @@ function init_ctx(ctx){
 	
 	renderBufferDim = [ww, hh];
 	
-	for(var i = 0; i < app.passes; i++){
-
+	var totpasses = app.passes;
+	for(var i = 0; i < totpasses; i++){
 		rttTexture[i] = gl.createTexture();
 		gl.bindTexture(gl.TEXTURE_2D, rttTexture[i]);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -311,7 +314,7 @@ function get_uniform(name){
 function draw_ctx(can, ctx){
 	program = ctx.program;
 	
-	if(ctx.program == undefined){
+	if(program == undefined){
 		return;
 	}
 
@@ -374,9 +377,10 @@ function draw_ctx(can, ctx){
 	app.ratio = ratio;
 	var ratioAttribute = get_uniform("ratio");
 	ctx.uniform1f(ratioAttribute, ratio);
-	
-	for(var pass = 0; pass < app.passes; pass++ ){
-		if(pass < app.passes - 1){
+
+	var totpasses = app.passes;
+	for(var pass = 0; pass < totpasses; pass++ ){
+		if(pass < totpasses - 1){
 			ctx.bindFramebuffer(ctx.FRAMEBUFFER, framebuffer[pass]);
 		} else {
 			ctx.bindFramebuffer(ctx.FRAMEBUFFER, null);
@@ -417,7 +421,7 @@ function update_shader(){
 
 function update_screen(){
 	draw_ctx(game_canvas, gl);
-	if(app.status == STATUS_PLAYING){
+	if(app.status == 1){
 		compute();
 	}
 	window.requestAnimationFrame(update_screen);
@@ -495,10 +499,10 @@ var last_time = null;
 var last_points_th = 0; // Last points thousand
 var last_dsecond = null; // (d for deci (10^-1))
 var begin_time = new Date().getTime();
-var rocket_pos = [0.0, -0.23, 0]; // Last is angle
-var rocket_speed = [0.0, 0.0, 0]; // Last is angle'
 var star = [0.0, -1.0];
 var asteroid = [0.0, -1.0];
+var rocket_pos = [0.0, -0.23, 0]; // Last is angle
+var rocket_speed = [0.0, 0.0, 0]; // Last is angle'
 var accelerating = 0;
 
 function compute(){
@@ -600,13 +604,13 @@ function compute(){
 
 	// Has hit asteroid ?
 	if(distance(asteroid, rocket_pos) < 0.1){
-		coinaudio.play();
 		asteroid[1] = -1.0;
+		boomaudio.play();
 		app.lives--;
+		one_less_live_anim();
 		if(app.lives <= 0){
 			app.dead();
 		}
-		one_less_live_anim();
 	}
 
 	star[1] -= dt * 0.03;
@@ -634,6 +638,11 @@ function compute(){
 var coinaudio = qsa("audio[name='coinsound']")[0];
 coinaudio.volume = 0.1;
 
+var failaudio = qsa("audio[name='failsound']")[0];
+failaudio.volume = 1.0;
+
+var boomaudio = qsa("audio[name='boomsound']")[0];
+boomaudio.volume = 0.1;
+
 var musicaudio = qsa("audio[name='music']")[0];
 musicaudio.volume = 0.06;
-musicaudio.play();

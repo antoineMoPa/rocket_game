@@ -157,12 +157,27 @@ void main(void){
 		col *= 0.8;
 		// Make whiter smoke with time
 		col = 0.85 * col + 0.15 * length(col.rgb)/3.0;
-
+		
 		// Asteroid smoke
 		if(ad < 0.1){
 			col.rgb += 0.01 * (1.0 - ad)/0.1 * vec3(1.0, 0.3, 0.4);
 		}
-		
+		// Explosion
+		if(flashing > 0.5){
+			float d = distance(rocket_pos.xy, pos);
+			if(d < 0.1 + 0.1 * cos(time * 10.0 - d * 10.0)){
+				vec2 p = pos - rocket_pos.xy;
+				float a = atan(p.y, p.x);
+				float fac = 0.1;
+
+				if(tri(a / PI2 * 8.0) > cos(d * 30.0)){
+					fac += 0.2;
+				}
+				
+				col.rgb += fac *
+					vec3(0.8 * abs(cos(d * 40.0 + time * 100.0)), 0.2, 0.2);
+			}
+		}
 	} else if (pass == 2) {
 		// Smoke
 		col += texture2D(lastPass, lastUV);
@@ -193,10 +208,6 @@ void main(void){
 		
 		// Rocket
 		vec4 r = rocket(rp);
-		
-		if(flashing > 0.5){
-			r *= floor(2.0 * abs(cos(time * 600.0))) + 0.3;
-		}
 
 		col = col * (1.0 - r.a) + r * r.a;
 		

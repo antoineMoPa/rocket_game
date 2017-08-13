@@ -10,30 +10,40 @@
 		<audio name="coinsound">
 			<source src="music/8bitcoin.mp3" type="audio/mpeg">
 		</audio>
+		<audio name="failsound">
+			<source src="music/fail.mp3" type="audio/mpeg">
+		</audio>
+		<audio name="boomsound">
+			<source src="music/boom.mp3" type="audio/mpeg">
+		</audio>
 		<audio loop name="music">
 			<source src="music/bct/BigCarTheft.mp3" type="audio/mpeg">
 		</audio>
+		<canvas class="game-canvas" v-on:mousemove="canvas_mousemove"></canvas>
 		<div id="shadergame-app" class="page-content vertical-scroll-parent">
-			<p class="points-display">
-				{{ points }}
-			</p>
+			<div v-if="status == 1">
+				<p class="points-display">
+					{{ points }}
+				</p>
+				<div class="lives">
+					<img class="life" v-for="live in lives" src="images/rocket.png">
+				</div>
+			</div>
 			<div class="bonus-display">
 			</div>
-			<canvas class="game-canvas" v-on:mousemove="canvas_mousemove"></canvas>
-			<div class="lives">
-				<img class="life" v-for="live in lives" src="images/rocket.png">
-			</div>
+			
 			<pre class="fragment-error-pre">
 			</pre>
 			<pre class="vertex-error-pre">
 			</pre>
-			<div class="menu" v-if="status == STATUS_MENU">
+			<div class="menu" v-if="status == 0">
+				<h1>ShaderRocket</h1>
 				<p class="text-center your-score" v-if="games > 0" >
-					Your scored {{points}} points!
+					You scored {{points}} points!
 				</p>
 				<div class="text-center">
 					<img src="images/play.png" class="menu-button play-img"
-						 v-on:click="start()">
+						 v-on:click="start">
 				</div>
 			</div>
 		</div>
@@ -52,7 +62,7 @@ void main(){
 }
 		</script>
 		
-		<script src="js/lib/vue.min.js?version=1.0.3"></script>
+		<script src="js/lib/vue.js?version=1.0.3"></script>
 		<script src="js/lib/base.js?version=1.0.3"></script>
 		<script src="js/shadergame.js?version=1.0.3"></script>
 	</body>
