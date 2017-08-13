@@ -489,15 +489,26 @@ function bonus(msg){
 	},2000);
 }
 
+function antibonus(msg){
+	var antibonusdisp = qsa(".antibonus-display")[0];
+	antibonusdisp.classList.add("antibonus-anim");
+	antibonusdisp.innerText = msg;
+	setTimeout(function(){
+		antibonusdisp.classList.remove("antibonus-anim");
+		antibonusdisp.innerText = "";
+	},4000);
+}
+
+
 function one_less_live_anim(){
 	gl.uniform1f(
-		get_uniform('flashing'),
-		true
+		get_uniform('destruction'),
+		1.0
 	);
 	setTimeout(function(){
 		gl.uniform1f(
-			get_uniform('flashing'),
-			false
+			get_uniform('destruction'),
+			0.0
 		);
 	},1500);
 }
@@ -506,9 +517,22 @@ function points_up_anim(){
 	var ptsdisp = qsa(".points-display")[0];
 	
 	ptsdisp.classList.add("points-up-anim");
-
+	
 	setTimeout(function(){
 		ptsdisp.classList.remove("points-up-anim");
+	},500);
+}
+
+function got_star_anim(){
+	gl.uniform1f(
+		get_uniform('gotstar'),
+		1.0
+	);
+	setTimeout(function(){
+		gl.uniform1f(
+			get_uniform('gotstar'),
+			0.0
+		);
 	},500);
 }
 
@@ -619,6 +643,7 @@ function compute(){
 		star[1] = -1.0;
 		app.points += 100;
 		bonus("+100");
+		got_star_anim();
 	}
 
 	// Has hit asteroid ?
@@ -626,9 +651,12 @@ function compute(){
 		asteroid[1] = -1.0;
 		boomaudio.play();
 		app.lives--;
+		var l = app.lives;
 		one_less_live_anim();
-		if(app.lives <= 0){
+		if(l <= 0){
 			app.dead();
+		} else {
+			antibonus(l + " rocket" + (l > 1? "s": "") + " left.");
 		}
 	}
 

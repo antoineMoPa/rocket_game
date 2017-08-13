@@ -23,7 +23,8 @@ uniform vec2 asteroid;
 uniform float accelerating;
 varying vec2 lastUV;
 uniform float time;
-uniform float flashing;
+uniform float destruction;
+uniform float gotstar;
 uniform int pass;
 uniform sampler2D pass0;
 uniform sampler2D pass1;
@@ -163,7 +164,7 @@ void main(void){
 			col.rgb += 0.01 * (1.0 - ad)/0.1 * vec3(1.0, 0.3, 0.4);
 		}
 		// Explosion
-		if(flashing > 0.5){
+		if(destruction > 0.5){
 			float d = distance(rocket_pos.xy, pos);
 			if(d < 0.1 + 0.1 * cos(time * 10.0 - d * 10.0)){
 				vec2 p = pos - rocket_pos.xy;
@@ -202,7 +203,25 @@ void main(void){
 			float f = 1.0 - tri(angle * 5.0 / PI2) * 0.27;
 
 			if(d < f){
-				col.rg += 0.8;
+				col.rg += 0.98;
+			}
+		}
+		
+        // Success
+		if(gotstar > 0.5){
+			float d = distance(rocket_pos.xy, pos) / 0.2;
+				
+			if(d < 1.0){
+				vec2 p = pos - rocket_pos.xy;
+				float a = atan(p.y, p.x);
+				float fac = 0.0;
+				
+				fac += 0.3 * abs(cos(d * 20.0 - time * 10.0));
+				
+				col.rgb +=
+					(1.0 - d) *
+					fac *
+					vec3(1.0, 1.0, 0.0);
 			}
 		}
 		

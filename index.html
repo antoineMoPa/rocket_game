@@ -35,7 +35,8 @@
 			</div>
 			<div class="bonus-display">
 			</div>
-			
+			<div class="antibonus-display">
+			</div>
 			<pre class="fragment-error-pre">
 			</pre>
 			<pre class="vertex-error-pre">
@@ -46,8 +47,11 @@
 					You scored {{points}} points!
 				</p>
 				<div class="text-center">
-					<img src="images/play.png" class="menu-button play-img"
-						 v-on:click="start">
+					<div class="menu-button" v-on:click="start">
+						<img src="images/play.png" class="play-img">
+						<br>
+						Play
+					</div>
 				</div>
 			</div>
 		</div>

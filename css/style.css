@@ -87,7 +87,8 @@ button{
 	color:#ff2;
 }
 
-.bonus-display{
+.bonus-display,
+.antibonus-display{
 	position: absolute;
 	top:50%;
 	left:0;
@@ -98,6 +99,10 @@ button{
 	margin:auto;
 	line-height:0;
 	opacity:0;
+}
+
+.antibonus-display{
+	color:#f31;
 }
 
 @keyframes pointsup {
@@ -133,6 +138,12 @@ button{
     animation-duration: 0.5s;
 }
 
+.antibonus-anim{
+    animation-name: bonusanim;
+    animation-duration: 2.0s;
+}
+
+
 .lives{
 	position:absolute;
 	top:20px;
@@ -160,6 +171,9 @@ button{
 	border-radius:15px;
 	cursor:pointer;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+	display:inline-block;
+	font-size:15px;
+	font-weight:700;
 }
 
 .menu-button:hover{
