@@ -212,6 +212,12 @@ button{
 	text-shadow:2px 2px 0 #441;  
 }
 
+@media all and (max-width:1000px){
+	.your-score{
+		font-size:25px;
+	}
+}
+
 .current-highscore{
 	font-size:11px;
 	color: #333;
