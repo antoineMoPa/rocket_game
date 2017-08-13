@@ -16,6 +16,16 @@ var is_example = window.location.href.match(/\?file\=([_a-zA-Z0-9\/]+\.glsl)/);
 var DEFAULT_WIDTH = window.innerWidth;
 var DEFAULT_HEIGHT = window.innerHeight;
 var started = false;
+
+var coinaudio = qsa("audio[name='coinsound']")[0];
+coinaudio.volume = 1.0;
+
+var failaudio = qsa("audio[name='failsound']")[0];
+failaudio.volume = 1.0;
+
+var boomaudio = qsa("audio[name='boomsound']")[0];
+boomaudio.volume = 0.1;
+
 //var STATUS_MENU = 0;
 //var STATUS_PLAYING = 1;
 //var STATUS_AD = 1;
@@ -115,10 +125,8 @@ var app = new Vue({
 			asteroid = [0.0, -1.0];
 			this.status = 1;
 			rocket_pos[0] = 0.0;
-			rocket_pos[1] = -0.2;
+			rocket_pos[1] = 0.0;
 			rocket_pos[2] = 0.0;
-			musicaudio.play();
-			musicaudio.currentTime = 0;
 		},
 		dead: function(){
 			this.status = 0;
@@ -126,7 +134,6 @@ var app = new Vue({
 			rocket_pos[0] = 0.0;
 			rocket_pos[1] = -0.2;
 			rocket_pos[2] = 0.0;
-			musicaudio.pause();
 			failaudio.play();
 			
 			if(this.points > this.highscore){
@@ -633,8 +640,8 @@ function compute(){
 	}
 
 	// Clamp vertical
-	if(rocket_pos[1] > 1.0 / app.ratio){
-		rocket_pos[1] = 1.0 / app.ratio;
+	if(rocket_pos[1] > 0.4){
+		rocket_pos[1] = 0.4;
 	}
 	if(rocket_pos[1] < -1.0 / app.ratio){
 		rocket_pos[1] = -1.0 / app.ratio;
@@ -677,7 +684,7 @@ function compute(){
 	// Bring back star to the top
 	if(star[1] < -1.2){
 		star[1] = 1.0;
-		star[0] = 2.0 * (Math.random() - 0.5);
+		star[0] = 1.0 / app.ratio * (Math.random() - 0.5);
 	}
 
 	asteroid[1] -= dt * 0.02;
@@ -703,15 +710,3 @@ function compute(){
 		asteroid[0] = 0.1 * (Math.random() - 0.5) + rocket_pos[0];
 	}
 }
-
-var coinaudio = qsa("audio[name='coinsound']")[0];
-coinaudio.volume = 0.1;
-
-var failaudio = qsa("audio[name='failsound']")[0];
-failaudio.volume = 1.0;
-
-var boomaudio = qsa("audio[name='boomsound']")[0];
-boomaudio.volume = 0.1;
-
-var musicaudio = qsa("audio[name='music']")[0];
-musicaudio.volume = 0.06;

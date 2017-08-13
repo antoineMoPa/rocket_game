@@ -208,6 +208,7 @@ button{
 
 .your-score{
 	font-size:40px;
+	margin-top:-20px;
 	color:#fe7;
 	text-shadow:2px 2px 0 #441;  
 }
@@ -248,19 +249,14 @@ button{
 .credits{
 	font-size:10px;
 	color:#333;
-}
-
-@media all and (min-width:1000px){
-	.credits{
-		position:absolute;
-		bottom:10px;
-		left:10px;
-	}
+	position:absolute;
+	bottom:10px;
+	left:10px;
 }
 
 @media all and (max-width:1000px){
 	.credits{
-		max-height:70px;
+		max-height:120px;
 		overflow-y:scroll;
 	}
 }

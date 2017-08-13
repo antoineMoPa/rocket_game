@@ -3,9 +3,10 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-		<title>ShaderGame</title>
+		<title>ShaderRocket</title>
 		<link rel="stylesheet" href="css/base.css?version=1.0.3">
 		<link rel="stylesheet" href="css/style.css?version=1.0.3">
+		<link rel="icon" sizes="192x192" href="images/rocket192.png">
 	</head>
 	<body>
 		<audio name="coinsound">
@@ -16,9 +17,6 @@
 		</audio>
 		<audio name="boomsound">
 			<source src="music/boom.mp3" type="audio/mpeg">
-		</audio>
-		<audio loop name="music">
-			<source src="music/bct/BigCarTheft.mp3" type="audio/mpeg">
 		</audio>
 		<canvas class="game-canvas" v-on:mousemove="canvas_mousemove"></canvas>
 		<div id="shadergame-app" class="page-content vertical-scroll-parent">
@@ -76,8 +74,6 @@
 						The fragment shader is licensed under CC-BY-NC (Attribution, non-comercial).
 						<br>
 						Details on github: <a href="https://github.com/antoineMoPa/rocket_game">Github project</a>
-						<br>
-						Music by audionautix.com
 						<br>
 						Boom from user lagomen on freesound.org:
 						https://freesound.org/people/lagomen/sounds/117091/

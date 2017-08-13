@@ -7,4 +7,4 @@ The rest (javascript, html, CSS) is available under the terms of the GNU general
 
 What this means is that you can create your own game and publish it, but you must write a new fragment shader (I suggest you also change the JS code to make something different, but it is up to you).
 
-The music and sound effects have their own license found in their respective folders. Some sound effects I used are in the public domain.
+The sound effects have their own license found in their respective folders. Some sound effects I used are in the public domain.
