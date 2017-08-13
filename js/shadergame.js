@@ -537,11 +537,14 @@ function compute(){
 	var angle = rocket_pos[2];
 	
 	if(watched_keys["ArrowLeft"]){
-		rocket_speed[2] -= dt * 0.2 * (rocket_speed[2] + 1.4);
+		rocket_pos[2] -= 0.4;
+		rocket_pos[0] -= 0.1 * dt;
 	}
 	if (watched_keys["ArrowRight"]) {
-		rocket_speed[2] += dt * 0.2 * (rocket_speed[2] + 1.4);
+		rocket_pos[2] += 0.4;
+		rocket_pos[0] += 0.1 * dt;
 	}
+	
 	if(watched_keys["ArrowUp"]){
 		rocket_speed[0] -= dt * 0.01 * Math.cos(angle + Math.PI/2);
 		rocket_speed[1] += dt * 0.02 * Math.sin(angle + Math.PI/2);
@@ -561,14 +564,15 @@ function compute(){
 		rocket_speed[1] += 0.01 * Math.abs(rocket_pos[1] + 0.3);
 	}
 	
-	
 	rocket_pos[0] += dt * rocket_speed[0];
 	rocket_speed[0] *= 0.94;
 	rocket_pos[1] += dt * rocket_speed[1];
 	rocket_speed[1] *= 0.94;
-	rocket_pos[2] += dt * rocket_speed[2];
-	rocket_speed[2] *= 0.6;
+	//rocket_pos[2] += dt * rocket_speed[2];
+	//rocket_speed[2] *= 0.6;
 
+	rocket_pos[2] *= 0.5 * dt;
+	
 	// Restrict angle
 	if(rocket_pos[2] > 1.4){
 		rocket_pos[2] = 1.4;
@@ -603,7 +607,7 @@ function compute(){
 	}
 
 	// Has hit asteroid ?
-	if(distance(asteroid, rocket_pos) < 0.1){
+	if(distance(asteroid, rocket_pos) < 0.15){
 		asteroid[1] = -1.0;
 		boomaudio.play();
 		app.lives--;

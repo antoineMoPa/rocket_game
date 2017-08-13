@@ -93,7 +93,7 @@ button{
 	left:0;
 	text-align:center;
 	color:#ff4;
-	font-size:100px;
+	font-size:150px;
 	width:100%;
 	margin:auto;
 	line-height:0;
@@ -102,7 +102,7 @@ button{
 
 @keyframes pointsup {
     0% {
-		transform: scale(2.2) translateX(-20%) translateY(20%);
+		transform: scale(2.0) translateX(-20%) translateY(20%);
  	}
     100% {
  		transform: scale(1.0);
@@ -116,11 +116,11 @@ button{
 
 @keyframes bonusanim {
     0% {
-		transform: scale(1.2);
+		transform: scale(1.0);
 		opacity:0.2;
 	}
     50% {
-		transform: scale(1.0);
+		transform: scale(0.5);
 		opacity:1.0;
 	}
 	100% {
