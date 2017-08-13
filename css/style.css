@@ -185,6 +185,16 @@ button{
 	font-weight:700;
 }
 
+@media all and (max-width:1000px){
+	.menu-button{
+		padding:10px;
+		font-size:10px;
+	}
+	.menu-button img{
+		max-width:70px;
+	}
+}
+
 .menu-button:hover{
 	background:rgba(255,255,255,0.8);
 }
@@ -219,4 +229,24 @@ button{
 	bottom:6px;
 	right:100px;
 	cursor:pointer;
+}
+
+.credits{
+	font-size:10px;
+	color:#333;
+}
+
+@media all and (min-width:1000px){
+	.credits{
+		position:absolute;
+		bottom:10px;
+		left:10px;
+	}
+}
+
+@media all and (max-width:1000px){
+	.credits{
+		max-height:70px;
+		overflow-y:scroll;
+	}
 }
