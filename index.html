@@ -26,6 +26,13 @@
 				<p class="points-display">
 					{{ points }}
 				</p>
+				<p v-if="highscore > 0 && points < highscore" class="points-to-beat-display">
+					Beat {{ highscore }}
+				</p>
+				<p v-if="highscore > 0 && points > highscore" class="points-to-beat-display">
+					You beat your<br> highscore! <br>
+					( {{ highscore }} )
+				</p>
 				<div class="lives">
 					<img class="life" v-for="live in lives" src="images/rocket.png">
 				</div>
@@ -44,7 +51,14 @@
 			<div class="menu" v-if="status == 0">
 				<h1>ShaderRocket</h1>
 				<p class="text-center your-score" v-if="games > 0" >
+					<span v-if="new_highscore">
+						New Highscore!
+					</span>
+					<br v-if="new_highscore">
 					You scored {{points}} points!
+				</p>
+				<p v-if="highscore > 0 && !new_highscore" class="text-center current-highscore">
+					Current highscore: {{ highscore }}
 				</p>
 				<div class="text-center">
 					<div class="menu-button" v-on:click="start">

@@ -36,6 +36,8 @@ var app = new Vue({
 		status: 0,
         error: "",
 		passes: 1,
+		highscore: parseInt(window.localStorage.maxscore) || 0,
+		new_highscore: false,
 		games: 0,
 		lives: 3,
 		passes_defined_in_code: false,
@@ -124,6 +126,14 @@ var app = new Vue({
 			rocket_pos[2] = 0.0;
 			musicaudio.pause();
 			failaudio.play();
+			
+			if(this.points > this.highscore){
+				window.localStorage.maxscore = this.points;
+				this.new_highscore = true;
+				this.highscore = this.points;
+			} else {
+				this.new_highscore = false;
+			}
 		}
     }
 });
@@ -656,7 +666,7 @@ function compute(){
 		if(l <= 0){
 			app.dead();
 		} else {
-			antibonus(l + " rocket" + (l > 1? "s": "") + " left.");
+			antibonus(l + " rocket" + (l > 1? "s": "") + " left");
 		}
 	}
 
