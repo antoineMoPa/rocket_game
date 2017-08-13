@@ -599,7 +599,7 @@ function compute(){
 	}
 	
 	if(watched_keys["ArrowUp"]){
-		rocket_pos[1] += 0.1;
+		rocket_pos[1] += 0.05;
 		accelerating = 1.0;
 	} else {
 		accelerating = 0.0;
