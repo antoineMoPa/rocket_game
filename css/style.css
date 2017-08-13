@@ -185,3 +185,10 @@ button{
 	right:0;
 	cursor:pointer;
 }
+
+.up-keyboard{
+	position:absolute;
+	bottom:6px;
+	right:100px;
+	cursor:pointer;
+}

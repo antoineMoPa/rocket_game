@@ -63,6 +63,12 @@ var app = new Vue({
 			init_ctx(gl);
 			uniforms = {}
 		},
+		go_up: function(){
+			watched_keys["ArrowUp"] = true;
+			setTimeout(function(){
+				watched_keys["ArrowUp"] = false;
+			}, 100);
+		},
 		go_left: function(){
 			watched_keys["ArrowLeft"] = true;
 			setTimeout(function(){
@@ -557,8 +563,7 @@ function compute(){
 	}
 	
 	if(watched_keys["ArrowUp"]){
-		rocket_speed[0] -= dt * 0.01 * Math.cos(angle + Math.PI/2);
-		rocket_speed[1] += dt * 0.02 * Math.sin(angle + Math.PI/2);
+		rocket_pos[1] += 0.1;
 		accelerating = 1.0;
 	} else {
 		accelerating = 0.0;
@@ -598,19 +603,18 @@ function compute(){
 	if(rocket_pos[1] < -1.0 / app.ratio){
 		rocket_pos[1] = -1.0 / app.ratio;
 	}
-
+	
 	// Pacman positionning horizontal
-	if(rocket_pos[0] > 1.0){
-		rocket_pos[0] = -0.9;
-		rocket_speed[0] *= 0.2;
+	var limit = 0.5 * app.ratio;
+	if(rocket_pos[0] > limit){
+		rocket_pos[0] = limit;
 	}
-	if(rocket_pos[0] < -1.0){
-		rocket_pos[0] = 0.9;
-		rocket_speed[0] *= 0.2;
+	if(rocket_pos[0] < -limit){
+		rocket_pos[0] = -limit;
 	}
 
 	// Has point?
-	if(distance(star, rocket_pos) < 0.1){
+	if(distance(star, rocket_pos) < 0.15){
 		coinaudio.play();
 		star[1] = -1.0;
 		app.points += 100;
