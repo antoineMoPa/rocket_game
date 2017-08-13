@@ -20,6 +20,8 @@ var started = false;
 //var STATUS_PLAYING = 1;
 //var STATUS_AD = 1;
 
+var adcontainer = qsa(".ad-container")[0];
+
 var watched_keys = {
 	" ": false,
 	"ArrowLeft": false,
