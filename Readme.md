@@ -6,6 +6,10 @@ A small rocket game built with vue.js and a GLSL shader.
 
 The stars, asteroids and the rocket are made with code, no svg (except for the HUD).
 
+# Where do I play this?
+
+[antoinemopa.github.io/rocket_game/](https://antoinemopa.github.io/rocket_game/)
+
 # Known problems
 
 On some platform/graphics-card/browser combinations, the smoke goes sideways.
