@@ -210,7 +210,7 @@ button{
 	font-size:40px;
 	margin-top:-20px;
 	color:#fe7;
-	text-shadow:2px 2px 0 #441;  
+	text-shadow:1px 1px 0 rgba(0,0,0,0.7), 0 0 20px rgba(100,100,100,0.6);
 }
 
 @media all and (max-width:1000px){
@@ -246,7 +246,7 @@ button{
 	cursor:pointer;
 }
 
-.credits{
+.mobile-credits, .credits{
 	font-size:10px;
 	color:#333;
 	position:absolute;
@@ -256,7 +256,15 @@ button{
 
 @media all and (max-width:1000px){
 	.credits{
-		max-height:120px;
-		overflow-y:scroll;
+		display:none;
+	}
+	.mobile-credits{
+		display:block;
+	}
+}
+
+@media all and (min-width:1000px){
+	.mobile-credits{
+		display:none;
 	}
 }

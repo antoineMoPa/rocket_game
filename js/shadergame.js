@@ -9,7 +9,10 @@
 
   */
 
-var sg_api = window.location.protocol + "//" + window.location.host + ":4002/api";
+//
+// Note: I started with shadergif's core JS, so you may see legacy weird stuff.
+// 
+
 var fragment_code = "";
 
 var is_example = window.location.href.match(/\?file\=([_a-zA-Z0-9\/]+\.glsl)/);
