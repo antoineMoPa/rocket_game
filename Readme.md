@@ -1,3 +1,15 @@
+# What is this?
+
+A small rocket game built with vue.js and a GLSL shader.
+
+# Tell me something interesting
+
+The stars, asteroids and the rocket are made with code, no svg (except for the HUD).
+
+# Known problems
+
+On some platform/graphics-card/browser combinations, the smoke goes sideways.
+
 # LICENSE
 
 The fragment shader (frag.glsl) and the images (images folder) are available under the Creative Commons CC BY-NC 3.0
